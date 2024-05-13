@@ -1,3 +1,4 @@
+"use client"
 import Image from "next/image"
 import { useEffect, useState } from 'react';
 import { commentaries } from "@/app/comments/data";
@@ -25,6 +26,20 @@ export default function Example() {
       const data = await response.json();
       setSearchedComment(data);
     }
+  };
+
+  const handleSubmitPost = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const response = await fetch('https://jsonplaceholder.typicode.com/comments', {
+      method: 'POST',
+      body: JSON.stringify(newComment),
+      headers: {
+        'Content-type': 'application/json; charset=UTF-8',
+      },
+    });
+    const data = await response.json();
+    setComments([...comments, data]);
+    setNewComment({ name: '', body: '' });
   };
 
   return (
@@ -56,7 +71,7 @@ export default function Example() {
               </div>
               <div className="group relative">
                 <h3 className="mt-3 text-lg font-semibold leading-6 text-gray-900 group-hover:text-gray-600">
-                  Customer Review #{commentaries.id}
+                  Expert Review #{commentaries.id}
                 </h3>
                 <p className="mt-5 line-clamp-3 text-sm leading-6 text-gray-600">{commentaries.description}</p>
               </div>
@@ -148,6 +163,7 @@ export default function Example() {
         </figure>
       </div>
 
+
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(45rem_50rem_at_top,theme(colors.indigo.100),white)] opacity-20" />
       <div className="absolute inset-y-0 right-1/2 -z-10 mr-16 w-[200%] origin-bottom-left skew-x-[-30deg] bg-white shadow-xl shadow-indigo-600/10 ring-1 ring-indigo-50 sm:mr-28 lg:mr-0 xl:mr-16 xl:origin-center" />
       <div className="mx-auto max-w-2xl lg:max-w-4xl">        
@@ -168,41 +184,70 @@ export default function Example() {
           </figcaption>
         </figure>
 
-{/* ACA PUEDO AGREGAR EL FORMULARIO */}
+
           <div className="py-24 sm:py-32 m-5">
             <div className="mx-auto max-w-7xl px-6 lg:px-8">
               <h2 className="text-center text-lg font-semibold leading-8 text-gray-900">
                 Do you want to be a part of our WALL OF FAME?
               </h2>
               <p className="text-center text-gray-600">Leave us your review</p>
-              
+              <div className="max-w-3xl mx-10 p-4">
+                <h1 className="text-3xl font-semibold mb-4">Customer Reviews</h1>
+                <div className="grid gap-4">
+                  {searchedComment && (
+                    <div className="bg-gray-100 p-4 rounded-md">
+                      <h2 className="text-lg font-semibold">{searchedComment.name}</h2>
+                      <p>{searchedComment.body}</p>
+                    </div>
+                  )}
+                  {!searchedComment && (
+                    <div className="grid gap-4">
+                      {comments.map(comment => (
+                        <div key={comment.id} className="bg-gray-100 p-4 rounded-md">
+                          <h2 className="text-lg font-semibold">{comment.name}</h2>
+                          <p>{comment.body}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <form onSubmit={handleSubmit} className="mt-4">
+                  <input
+                    type="number"
+                    placeholder="Search by ID"
+                    className="w-full border border-gray-300 rounded-md p-2 mb-2"
+                    value={searchId || ''}
+                    onChange={e => setSearchId(Number(e.target.value))}
+                  />
+                  <button type="submit" className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">
+                    Search
+                  </button>
+                </form>
+                <form onSubmit={handleSubmitPost} className="mt-4">
+                  <input
+                    type="text"
+                    placeholder="Name"
+                    className="w-full border border-gray-300 rounded-md p-2 mb-2"
+                    value={newComment.name}
+                    onChange={e => setNewComment({ ...newComment, name: e.target.value })}
+                  />
+                  <textarea
+                    placeholder="Leave yor review"
+                    className="w-full border border-gray-300 rounded-md p-2 mb-2"
+                    value={newComment.body}
+                    onChange={e => setNewComment({ ...newComment, body: e.target.value })}
+                  ></textarea>
+                  <button type="submit" className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">
+                    Send
+                  </button>
+                </form>
+              </div>
 
-              
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-              {/* <form className="mt-5 mx-auto">
-                <label for="countries" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select your membership</label>
-                <select id="countries" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+              {/* ++++++ESTAS VAN A SER LAS EXPERT REVIEWS, OTRO FORMULARIO PARA QUE LA REVIEW TENGA MAS DATOS Y SEA MAS COMPLETA+++
+              <form className="mt-5 mx-auto">
+                <label for="membershipType" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select your membership</label>
+                <select id="membershipType" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                   <option>---</option>
                   <option>Guess</option>
                   <option>New Customer / CTO</option>
@@ -224,15 +269,8 @@ export default function Example() {
               </form> */}
               
               
-
-
-
-
-
-
               </div>
-          </div>  
-      
+          </div>        
       </div>
     </section>  
     </div>
